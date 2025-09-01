@@ -1,0 +1,305 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        240
+      ],
+      "id": "7b2cc749-f29d-4c80-8ec1-2fb7a1cece8e",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "ybRg3lag38rmtn5D",
+          "name": "Shab OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "fields": [
+          "*"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        400,
+        448
+      ],
+      "id": "b7f0e0ac-8cea-4971-8365-cb1667e1c5b6",
+      "name": "Google Contacts1",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "qzec78Rs8z6LgndX",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "shabbir@shabbirnoor.com",
+          "mode": "list",
+          "cachedResultName": "shabbir@shabbirnoor.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        544,
+        448
+      ],
+      "id": "132d7f38-dc60-4335-82bd-f5ef42262419",
+      "name": "Create Calendar Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "51R9cHizp3jWVLGz",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "shabbir@shabbirnoor.com",
+          "mode": "list",
+          "cachedResultName": "shabbir@shabbirnoor.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        688,
+        448
+      ],
+      "id": "a1d9d13d-2a57-4302-b327-795ed86b682e",
+      "name": "Search Calendar Events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "51R9cHizp3jWVLGz",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        448
+      ],
+      "id": "2b767535-91e3-45ee-9c76-214344073305",
+      "name": "Gmail1",
+      "webhookId": "119c8f98-dcda-49d6-93c1-f0dc03246212",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "47wVmO3uPCdVj57K",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.webhook_input }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant. Your job is to help me access my calendars and contacts using the Google Contacts tool and the Google Calendar tool.\n\nTo use the Google Contacts tool, search using the name I specify to find the particular content I am looking for. Don't search for more than one field.\n\nOnce a meeting has been scheduled successfully, send an email to myself (shabbir@shabbirnoor.com) informing me that the meeting has been scheduled.\n\nFor reference, the current date is {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        448,
+        0
+      ],
+      "id": "df0f0f9d-52a1-48c1-b786-6d5cd20ca1bd",
+      "name": "Meeting Scheduler"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d482c8da-e708-4067-ae91-241b0a35a318",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "22931b10-9d34-4b9e-b628-89fb98e209fb",
+      "name": "Webhook",
+      "webhookId": "d482c8da-e708-4067-ae91-241b0a35a318"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        928,
+        0
+      ],
+      "id": "257f5e45-f791-4b2b-8f73-db8d465571f9",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aa8ad5cb-10c5-4f01-9e8e-b166f131b7f0",
+              "name": "webhook_input",
+              "value": "={{ $json.body.transcription }}",
+              "type": "string"
+            },
+            {
+              "id": "9c480d20-da49-4a9c-a6d1-7d1f3c27d97c",
+              "name": "session",
+              "value": "={{ $json.body.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        0
+      ],
+      "id": "0a8c0661-e3a1-4786-9f4d-68b96884b866",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Meeting Scheduler",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Contacts1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Meeting Scheduler",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Calendar Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Meeting Scheduler",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Calendar Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "Meeting Scheduler",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Meeting Scheduler",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Scheduler": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Meeting Scheduler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f8d903bf41171a711206c3bb74b40015823841bf2b93e148da68e764370f1965"
+  }
+}
