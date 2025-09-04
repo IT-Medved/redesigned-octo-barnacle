@@ -1,0 +1,476 @@
+{
+  "name": "Image Classifier",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## I Made Nano Banana Auto‑Tag My Photo Library – No Manual Work\n\nStep 1 - upload photos to Google Drive\nStep 2 - loop over every item, analyze the image, and rename it using AI\nStep 3 - list files and folders\nStep 4 - aggregate\nStep 5 - ai agent will classify and move",
+        "height": 208,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "2cf3784d-591d-427f-94b8-95a13e250d20",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Nano Banana Image Sorting by Shab Noor",
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "2382da9b-5eb9-4d25-826e-8ad25b6845ba",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        504
+      ],
+      "id": "5b011652-5dc3-40c6-9efb-2b5b00ec3969",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1yGC0e5WZvSCNNu5JkDwxJPYOTjU06Kuf",
+            "mode": "list",
+            "cachedResultName": "Nano Banana Images",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1yGC0e5WZvSCNNu5JkDwxJPYOTjU06Kuf"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        504
+      ],
+      "id": "762fda39-05b9-45bc-9dff-9ba8c36c006f",
+      "name": "Search files and folders2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -96,
+        504
+      ],
+      "id": "fdbc6ffa-e37c-4518-b4f2-b142f724c4a2",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image-preview:free\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Analyze this image, and based on what you find, output a suggested file name in this format: blah-blah-blah - the file name should be descriptive enough to find in search, and use up to 6 or 7 words. If the main subject is too blurry, output DELETE\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"https://drive.google.com/uc?export=download&id={{ $json.id }}\"\n          }\n        }\n      ]\n    }\n  ]\n  \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        432
+      ],
+      "id": "b48b59ab-bf92-490a-8e2c-6fcea78de66b",
+      "name": "HTTP Request",
+      "credentials": {
+        "openRouterApi": {
+          "id": "A7JaVK4hNWPXUTuK",
+          "name": "n8n tutorial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders2').item.json.id }}",
+          "mode": "id"
+        },
+        "newUpdatedFileName": "={{ $json.choices[0].message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        352,
+        432
+      ],
+      "id": "59428768-0cce-4994-8e8b-9e6eed1cf0e2",
+      "name": "Update file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1yGC0e5WZvSCNNu5JkDwxJPYOTjU06Kuf",
+            "mode": "list",
+            "cachedResultName": "Nano Banana Images",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1yGC0e5WZvSCNNu5JkDwxJPYOTjU06Kuf"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        576,
+        432
+      ],
+      "id": "eeebce40-3a1f-42c2-9328-2c6d7fd37e2a",
+      "name": "Search files and folders3",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "id"
+            },
+            {
+              "fieldToAggregate": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        800,
+        432
+      ],
+      "id": "cc503670-bf23-46ba-bca3-16c58c38b05e",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nFile Name -  {{ $('Update file1').item.json.name }}\n\nFile ID - {{ $('Update file1').item.json.id }}\n\nFolder IDs and Corresponding Names(comma separated)\n\n{{ $json.id }}\n{{ $json.name }}",
+        "options": {
+          "systemMessage": "=You are a photo sorting agent. You will be provided with a descriptive file name and its corresponding Google Drive File Id, as well as a list of existing folder IDs and their names.\n\nBased on the name, determine if the file can go into any of the existing folders, and if so, use the Move File tool to do so.\n\nIf there is no existing folder, use the Create Folder tool to create a folder with a generic category-style name, and then use the Move tool to move the file to that folder.\n\nIf a file is named delete, use the Delete file tool to delete it."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1144,
+        504
+      ],
+      "id": "6448b83c-535c-479b-bae4-b44d05c9b94a",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        728
+      ],
+      "id": "118f9d2c-07b7-4ffe-ba69-add26273e095",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "ybRg3lag38rmtn5D",
+          "name": "Shab OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $fromAI(\"folder_name\") }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1yGC0e5WZvSCNNu5JkDwxJPYOTjU06Kuf",
+          "mode": "list",
+          "cachedResultName": "Nano Banana Images",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1yGC0e5WZvSCNNu5JkDwxJPYOTjU06Kuf"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        1152,
+        728
+      ],
+      "id": "5722bfdc-c31b-46dd-83d0-553e9fadd10c",
+      "name": "Create folder in Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', ``, 'string') }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        728
+      ],
+      "id": "3bdea9a2-ac65-448c-83a7-8b17aef23418",
+      "name": "Move file in Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        1408,
+        728
+      ],
+      "id": "03f63a06-7d7f-4b08-8e58-a25dbb4aeeb7",
+      "name": "Delete a file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Update file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update file1": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders3": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder in Google Drive1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file in Google Drive1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "050ae705-0d72-4ca6-854c-7b58cca7735c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f8d903bf41171a711206c3bb74b40015823841bf2b93e148da68e764370f1965"
+  },
+  "id": "gb2F2v3Obij1S89Y",
+  "tags": []
+}
