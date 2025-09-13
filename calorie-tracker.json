@@ -1,0 +1,847 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "What's in this image? Be as detailed as possible, as your output will be used to calculate macros in the next step.\n\nOutput - the contents and components, as well as approximate quantities of each either as volume or mass.\n\nIf it's a nutrition label, just output the macros directly",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        288,
+        -176
+      ],
+      "id": "226f69c8-ea96-4c79-b962-068e4fcb6ac0",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "tcfiWgdi8tpoy60H",
+          "name": "Calorie Tracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.photo }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "6548370f-f84b-421d-b201-bedbe831e8dc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Photo"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "9f57ed3b-7976-4918-892d-a16c8920738c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[3].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        -176
+      ],
+      "id": "aac0b09d-6fc4-41ff-9900-69b75621e520",
+      "name": "Get a file",
+      "webhookId": "e20b66c6-622f-4d75-937d-616956820742",
+      "credentials": {
+        "telegramApi": {
+          "id": "upy4l6bI8RUrFwiM",
+          "name": "Calorie Tracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f7429c6c-5334-4971-8811-a9c1ef28b367",
+              "name": "prompt",
+              "value": "={{ $json.content }} ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        -176
+      ],
+      "id": "d53abf48-dcfe-4336-9d5d-9c3883d07a03",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e1e76c5-f0a1-4440-bdde-d7b56ed17741",
+              "name": "prompt",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        16
+      ],
+      "id": "5a0ad755-33d0-4953-bfd3-22e274484b5b",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "options": {
+          "systemMessage": "=You are a calorie tracker assistant.\n\nI will provide you with a description of what I ate, and your job is to calculate the calories, g protein, g carbs, and g fat from it. No decimals, just whole numbers.\n\nThen use the Airtable Update Calories tool to add the record. The current date and time is {{ $now }} - use the time to extrapolate which meal it was.\n\nThen, use the Airtable Get Calories tool to calculate my macros for the day, and how much remain.\n\nMy goals are:\n\n1900 calories\n119 g protein\n150 g carbs\n80 g fat\n\nI may also ask you for suggestions as to what to have now - use the Airtable Get Calories tool to calculate how much I've already had for the day, and provide suggestions for the next meal or the rest of the day, whatever I ask for."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        -80
+      ],
+      "id": "22028088-2ea6-4caa-8d0c-d7b55e42dd28",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        -80
+      ],
+      "id": "8822e554-b336-46f6-8078-3877d35c3757",
+      "name": "Send a text message",
+      "webhookId": "6b45295e-8b2b-4fb0-b44c-c538bd4145a7",
+      "credentials": {
+        "telegramApi": {
+          "id": "upy4l6bI8RUrFwiM",
+          "name": "Calorie Tracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Add Calories",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apph3oqjBkcN43rCd",
+          "mode": "list",
+          "cachedResultName": "Calorie Tracker",
+          "cachedResultUrl": "https://airtable.com/apph3oqjBkcN43rCd"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbluc40OR0T5oF0Kb",
+          "mode": "list",
+          "cachedResultName": "Daily Diary",
+          "cachedResultUrl": "https://airtable.com/apph3oqjBkcN43rCd/tbluc40OR0T5oF0Kb"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Meal Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Meal_Name', ``, 'string') }}",
+            "Calories": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calories', ``, 'number') }}",
+            "Protein (g)": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Protein__g_', ``, 'number') }}",
+            "Carbs (g)": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Carbs__g_', ``, 'number') }}",
+            "Fat (g)": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Fat__g_', ``, 'number') }}",
+            "Day": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Day', ``, 'number') }}",
+            "Month": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Month', ``, 'string') }}",
+            "Meal Type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Meal_Type', `Breakfast, Lunch, Dinner, Snack`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Meal Name",
+              "displayName": "Meal Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Meal Type",
+              "displayName": "Meal Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calories",
+              "displayName": "Calories",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Protein (g)",
+              "displayName": "Protein (g)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Carbs (g)",
+              "displayName": "Carbs (g)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fat (g)",
+              "displayName": "Fat (g)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Day",
+              "displayName": "Day",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        176
+      ],
+      "id": "704ea55d-9bb1-4565-b837-218b7eab5fb5",
+      "name": "Create a record in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "zWLJcCryxTdKGkUW",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "apph3oqjBkcN43rCd",
+          "mode": "list",
+          "cachedResultName": "Calorie Tracker",
+          "cachedResultUrl": "https://airtable.com/apph3oqjBkcN43rCd"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbluc40OR0T5oF0Kb",
+          "mode": "list",
+          "cachedResultName": "Daily Diary",
+          "cachedResultUrl": "https://airtable.com/apph3oqjBkcN43rCd/tbluc40OR0T5oF0Kb"
+        },
+        "filterByFormula": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filter_By_Formula', `filter by the Month (full month name) and the Day (1, 2, 3 etc) - two separate columns one text and one number`, 'string') }}",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        928,
+        176
+      ],
+      "id": "49410cee-7784-43c2-91b8-933944785429",
+      "name": "Search records in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "zWLJcCryxTdKGkUW",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        176
+      ],
+      "id": "60ce34d6-224e-4c0f-a84e-423fcdab6d3d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tcfiWgdi8tpoy60H",
+          "name": "Calorie Tracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "19f9d281-283e-4e02-8880-d653d51245d4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        320
+      ],
+      "id": "e370a6fe-4689-4c05-84c6-439c4edf4a82",
+      "name": "Webhook",
+      "webhookId": "19f9d281-283e-4e02-8880-d653d51245d4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43ce828f-e31b-4ed0-be37-bd52d92abc86",
+              "name": "prompt",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        736
+      ],
+      "id": "7d2eb397-f621-44eb-9868-a4d66f9f2612",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a calorie tracking assistant. I will provide you with a description of food that I ate. Your job is to calculate the number of calories, grams of protein, grams of carbs, grams of carbs, and also output a confidence score on a scale of 0.00 to 1.00.\n\nTake whatever prompt I provide (as long as it's food) and output the above data - under no circumstances are you to ask for more information.\n\nOutput format:\n\n{\n\"name\": \"food_name\",\n\"calories\": \"123\",\n\"protein\": \"12\",\n\"carbs\": \"50\",\n\"fat\": \"10\",\n\"confidence\": \"0.9\"\n}",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        400,
+        672
+      ],
+      "id": "40b650d5-bf50-4f8a-8419-5bb00f4ec3a8",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ybRg3lag38rmtn5D",
+          "name": "Shab OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n   \"name\": \"{{ $json.choices[0].message.content.name }}\",\n   \"calories\": \"{{ $json.choices[0].message.content.calories }}\",\n  \"protein\": \"{{ $json.choices[0].message.content.protein }}\",\n  \"carbs\": \"{{ $json.choices[0].message.content.carbs }}\",\n  \"fat\": \"{{ $json.choices[0].message.content.fat }}\",\n  \"confidence\": \"{{ $json.choices[0].message.content.confidence }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        336,
+        912
+      ],
+      "id": "6b9dfc04-b2bf-49bb-9840-59e4dce47a91",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.image_url }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "461f48f2-07bc-42a2-ba66-a45049e34ce1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -80,
+        528
+      ],
+      "id": "01575fcb-816a-485f-a125-6dde2579ef64",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript)\n\nreturn items.map(item => {\n  const dataUri = $input.first().json.body.image_url; // <-- replace \"image\" with your actual field key from webhook\n\n  // Remove the \"data:image/...;base64,\" part\n  const base64 = dataUri.replace(/^data:image\\/\\w+;base64,/, '');\n\n  // Detect file extension\n  let extension = 'jpg';\n  if (dataUri.startsWith('data:image/png')) {\n    extension = 'png';\n  }\n\n  return {\n    json: {\n      base64,\n      extension\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        512
+      ],
+      "id": "64cf812e-70cd-42e1-9387-4ab7a4ee7c05",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "mimeType": "=image/{{ $json.extension }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        336
+      ],
+      "id": "1746bbdc-923d-4ac4-a7a1-37e2eb07f772",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "Provide a detailed description of the food that's in this image. Give approximate quantities as well - such as 100g of chicken breast, etc. ",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        320,
+        336
+      ],
+      "id": "9b86f99d-f1b0-46e1-877f-7d8359cec841",
+      "name": "Analyze image1",
+      "credentials": {
+        "openAiApi": {
+          "id": "ybRg3lag38rmtn5D",
+          "name": "Shab OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43ce828f-e31b-4ed0-be37-bd52d92abc86",
+              "name": "prompt",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        336
+      ],
+      "id": "7829185a-b3d4-49fd-b4c1-b1a82bec192a",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "940d013a-75cc-4b34-96c7-af53fe778ac5",
+      "name": "Telegram Trigger",
+      "webhookId": "8c32ec81-47e5-4e1a-a839-8af0a233b553",
+      "credentials": {
+        "telegramApi": {
+          "id": "upy4l6bI8RUrFwiM",
+          "name": "Calorie Tracker"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Analyze image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f8d903bf41171a711206c3bb74b40015823841bf2b93e148da68e764370f1965"
+  }
+}
