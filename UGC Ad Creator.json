@@ -40,7 +40,7 @@
         "nodeCredentialType": "openRouterApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image-preview:free\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Send message and wait for response').item.json.data.text }}. Photorealistic for a UGC ad. square ratio.\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"https://api.telegram.org/file/bot{{ $('Edit Fields').item.json.telegram_token }}/{{ $json.result.file_path }}\"\n          }\n        }\n      ]\n    }\n  ]\n  \n}",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image-preview\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Send message and wait for response').item.json.data.text }}. Photorealistic for a UGC ad. square ratio.\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"https://api.telegram.org/file/bot{{ $('Edit Fields').item.json.telegram_token }}/{{ $json.result.file_path }}\"\n          }\n        }\n      ]\n    }\n  ]\n  \n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
