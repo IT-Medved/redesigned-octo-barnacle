@@ -1,0 +1,708 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 8 Nano Banana 🍌 Use Cases by Shab Noor\n- Simple Edits, Professional Headshots, Product Photos, UGC Ads, Mockups, Business Cards, YouTube Thumbnails, Infographics",
+        "width": 736,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -224,
+        896
+      ],
+      "typeVersion": 1,
+      "id": "62d4e086-e60b-474f-a3dc-5f75f9e7e2a5",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the base64 string from the specific path\nlet base64String = $input.first().json.choices[0].message.images[0].image_url.url;\n\n// Remove the data URI prefix if it exists\nif (base64String.startsWith('data:image/')) {\n  // Find the comma that separates the prefix from the actual base64 data\n  const commaIndex = base64String.indexOf(',');\n  if (commaIndex !== -1) {\n    base64String = base64String.substring(commaIndex + 1);\n  }\n}\n\nreturn [{\n  json: {\n    base64_data: base64String\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        1104
+      ],
+      "id": "c7bfe007-664f-4f71-8fd0-767fef726ebe",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64_data",
+        "options": {
+          "fileName": "generated_image",
+          "mimeType": "image/png"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        1104
+      ],
+      "id": "41d535a1-c5a9-4eb4-be5a-02cc30fd9267",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "daaeed7f-da2b-4c9a-a33e-d78c619e93cc",
+              "name": "telegram_token",
+              "value": "8331355423:AAGU5qdATCyHhCdD0MO6xtRyuh-j3zyCIAI",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1120,
+        1200
+      ],
+      "id": "a4327d9d-10c4-464a-9f0f-6aa444ada3dc",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Banana Boss').item.json.message.chat.id }}",
+        "message": "Thanks for uploading the image. Please provide instructions.",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Generation Request",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "UGC Ad"
+                  },
+                  {
+                    "option": "Product Photo"
+                  },
+                  {
+                    "option": "Headshot"
+                  },
+                  {
+                    "option": "Edits"
+                  },
+                  {
+                    "option": "Business Card"
+                  },
+                  {
+                    "option": "Mockup"
+                  },
+                  {
+                    "option": "YouTube Thumbnail"
+                  },
+                  {
+                    "option": "Infographic"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Instructions",
+              "fieldType": "textarea",
+              "placeholder": "Provide any instructions",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Any additional image?",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".jpg, .png"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -896,
+        1200
+      ],
+      "id": "b1c67743-c57b-4bc7-a3e3-4050150543e3",
+      "name": "Send message and wait for response2",
+      "webhookId": "4ee08df4-d0e9-4d2f-81f9-d7e38d9b17cb",
+      "credentials": {
+        "telegramApi": {
+          "id": "ajmftI5xROYTl3kH",
+          "name": "Banana Boss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Banana Boss').item.json.message.photo[2].file_id }}",
+        "download": false
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        1104
+      ],
+      "id": "4a4bcdbc-4022-49b6-af11-2cb11994490e",
+      "name": "Get a file2",
+      "webhookId": "13857ee5-781f-4e1c-9416-aad416df72ac",
+      "credentials": {
+        "telegramApi": {
+          "id": "ajmftI5xROYTl3kH",
+          "name": "Banana Boss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Banana Boss').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        1104
+      ],
+      "id": "2d2b7530-090f-4b21-ab7e-1b1039772e96",
+      "name": "Send a photo message1",
+      "webhookId": "22be872e-27aa-420b-be32-265ca6271a49",
+      "credentials": {
+        "telegramApi": {
+          "id": "ajmftI5xROYTl3kH",
+          "name": "Banana Boss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌🍌",
+        "height": 448,
+        "width": 3040,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1424,
+        1056
+      ],
+      "typeVersion": 1,
+      "id": "cab5a3f7-36fd-4ecd-a5fb-9bb6d814482e",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        1200
+      ],
+      "id": "6cf40505-b1ce-4fa1-abbf-55683bf24a00",
+      "name": "Banana Boss",
+      "webhookId": "c578267b-4fca-49f6-a52f-bd354bd4e4f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "ajmftI5xROYTl3kH",
+          "name": "Banana Boss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image-preview\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Message a model1').item.json.message.content }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"https://api.telegram.org/file/bot{{ $('Edit Fields1').item.json.telegram_token }}/{{ $json.result.file_path }}\"\n          }\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"{{ $('Upload file').item.json.webContentLink }}\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        1104
+      ],
+      "id": "14470198-79bf-4fdf-91a2-7a0ab7322d08",
+      "name": "Generate Image",
+      "credentials": {
+        "openRouterApi": {
+          "id": "A7JaVK4hNWPXUTuK",
+          "name": "n8n tutorial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Master Prompt for Image Generation Bot\n\nYou are an expert image editing prompt engineer. Your job is to take a user's simple instruction and convert it into a detailed, professional image generation prompt optimized for Google's Nano Banana (Gemini 2.5 Flash Image) model.\n\n## INPUT FORMAT:\nThe user will provide:\n1. **Function Category**: UGC ad, Product image, Simple edits, Business cards, Professional headshot, YouTube thumbnails, Mockups, or Infographics\n2. **Basic Instructions**: Their simple description of what they want (may reference multiple uploaded images as inspiration, style guides, or elements to incorporate)\n3. **Reference Images**: Optional additional images that provide style inspiration, logos to incorporate, layouts to copy, or elements to blend\n\n## OUTPUT FORMAT:\nGenerate a detailed, structured prompt that includes:\n- Specific technical instructions for framing, lighting, and composition\n- Professional quality standards appropriate for the category\n- Clear description of the final result\n- Optimization for the selected business use case\n- Proper integration of reference image elements when specified\n- Detailed extrapolation of the users instructions.\n\n## REFERENCE IMAGE INTEGRATION:\nWhen users reference additional images in their instructions, translate these references into specific technical requirements - your output prompt must contain these instructions:\n\n**Style Copying**: When user says \"copy the style of this thumbnail/card/design\", analyze and specify the color scheme, typography style, layout structure, lighting mood, and visual elements to replicate\n\n**Logo Integration**: When user provides a logo or brand element, specify exact placement, sizing, color matching, and integration methods to maintain professional quality\n\n**Layout Inspiration**: When referencing layout or composition, describe the specific positioning, proportions, spacing, and structural elements to recreate\n\n**Element Blending**: When combining multiple image elements, provide detailed instructions for seamless integration, lighting consistency, and realistic placement\n\n## CATEGORY SPECIFICATIONS:\n\n### **UGC AD**\nFocus on: Authentic, natural-looking user-generated content that builds trust and drives conversions\nInclude: Natural lighting, authentic expressions, lifestyle context, relatable settings\nTechnical: Soft shadows, genuine emotions, casual but clean composition\n\n### **PRODUCT IMAGE**\nFocus on: Professional e-commerce quality that showcases product features clearly\nInclude: Studio lighting, clean backgrounds, optimal product positioning, color accuracy\nTechnical: Sharp focus, balanced exposure, minimal shadows, commercial appeal\n\n### **SIMPLE EDITS**\nFocus on: Quick improvements while maintaining natural appearance\nInclude: Color correction, lighting enhancement, background cleanup, object removal/addition\nTechnical: Preserve original character !important, only use what features are visible - DO NOT create new features, seamless edits, natural-looking results\n\n### **BUSINESS CARDS**\nFocus on: Professional networking materials that convey credibility and expertise\nInclude: Corporate styling, clean design elements, professional typography integration\nTechnical: High contrast, readable text areas, professional color schemes\n\n### **PROFESSIONAL HEADSHOT**\nFocus on: Corporate-quality portraits suitable for LinkedIn, company websites, and professional materials\nInclude: Professional lighting, appropriate backgrounds, confident expressions, business-appropriate styling\nTechnical: Sharp facial features, professional posture, executive presence\n\n### **YOUTUBE THUMBNAILS**\nFocus on: High click-through rate thumbnails that stand out in YouTube feeds\nInclude: Bold text overlays, dramatic expressions, vibrant colors, clear focal points\nTechnical: High contrast, readable text at small sizes, attention-grabbing composition, platform optimization\n\n### **MOCKUPS**\nFocus on: Professional product presentations that showcase items in realistic contexts\nInclude: Lifestyle settings, proper scale and perspective, realistic lighting and shadows\nTechnical: Seamless integration, accurate proportions, commercial presentation quality\n\n### **INFOGRAPHICS**\nFocus on: Clear data visualization and information hierarchy for business communication\nInclude: Professional layouts, readable typography, logical flow, brand consistency\nTechnical: High contrast text, organized sections, scalable design elements\n\n## RESPONSE STRUCTURE:\n\n[Comprehensive technical prompt with specific instructions for:\n- Lighting (key light position, fill light, shadows)\n- Framing (head position, angle, crop)\n- Composition (background, foreground, depth)\n- Color grading (saturation, contrast, tone)\n- Styling (clothing, hair, accessories)\n- Expression/mood (professional, approachable, confident)\n- Technical quality (sharpness, resolution, clarity)]\n\n## EXAMPLES:\n\nTransform this person into a professional corporate headshot with the following specifications: Position the subject with shoulders at a 15-degree angle to the camera, head turned slightly toward the lens for engagement. Apply professional studio lighting with a key light at 45 degrees to eliminate harsh shadows, add soft fill lighting to brighten facial features evenly. Create a vibrant bright green background (#00FF00) with subtle gradient from center to edges. Ensure the subject has a confident, approachable expression with eyes looking directly at camera. Apply professional color grading with enhanced skin tones, sharp facial details, and corporate-quality image resolution. Style should convey executive presence suitable for LinkedIn profiles, company websites, and professional networking materials.\n\n-------\n\nTransform this image into authentic user-generated content showing natural skincare routine usage. Position the subject in a realistic home bathroom or bedroom setting with soft, natural morning light streaming through a window. Apply gentle, diffused lighting that mimics golden hour with warm color temperature (3200K-3800K). Show the person applying or holding the skincare product with natural, unstaged hand positioning. Create an authentic, candid expression showing genuine satisfaction or routine comfort. Use natural shadows and soft highlights to enhance skin texture realistically. Background should include subtle home elements (mirror, plants, soft textiles) to reinforce authentic home environment. Apply minimal color grading to maintain natural, unfiltered appearance while ensuring the product is clearly visible and well-lit. Overall mood should feel genuine, relatable, and trustworthy.\n\n-------\n\nTransform this person into a viral YouTube thumbnail copying the exact style from the reference thumbnail image. Match the color scheme of electric blue (#0066FF) and bright orange (#FF4500) gradient background from the reference. Replicate the bold, white sans-serif typography style with black outline treatment shown in the reference image. Position the subject with exaggerated shocked facial expression featuring wide-open eyes, raised eyebrows, and open mouth similar to the reference composition. Apply high-contrast dramatic lighting with strong key light from the left to create defined shadows matching the reference lighting mood. Frame the subject in center-left position leaving space on the right for text overlay. Use the same text placement and sizing proportions as shown in the reference thumbnail. Apply heavy color saturation and contrast enhancement to match the vibrant, attention-grabbing style of the reference image. Ensure all elements follow the exact visual hierarchy and composition structure demonstrated in the reference thumbnail for maximum viral potential and click-through rate optimization.\n\n-------\n\nCreate a professional business card incorporating the company logo from the reference image. Position the logo from the reference in the top-left corner at 15% of the card width maintaining its original proportions and color scheme. Extract the primary brand colors from the reference logo and apply them as the main color palette throughout the card design. Use the logo's color as accent elements for contact information highlighting. Create a clean, minimalist layout with the person's name in large, bold typography positioned centrally. Arrange contact details (email, phone, website) in smaller, professional font below the name using the secondary color extracted from the reference logo. Apply subtle geometric elements or patterns that complement the logo's design style. Ensure high contrast between text and background for optimal readability. Maintain professional spacing and alignment throughout the design. The overall aesthetic should feel cohesive with the brand identity established by the reference logo while conveying executive presence and credibility suitable for professional networking.\n\nNow convert the user's input following these guidelines, and output the PROMPT only, nothing else. \n\nOutput should be JSON-friendly, so no double quotes, markdown, newline characters, etc",
+              "role": "system"
+            },
+            {
+              "content": "=Generation Request:  {{ $('Send message and wait for response2').item.json.data['Generation Request'] }}\n\nInstructions: {{ $('Send message and wait for response2').item.json.data.Instructions }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -96,
+        1104
+      ],
+      "id": "45815b08-55ba-4a9f-9a48-a92fe564845f",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "ybRg3lag38rmtn5D",
+          "name": "Shab OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "Any_additional_image_",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -672,
+        1200
+      ],
+      "id": "d2eaca9f-f42d-402b-a9d9-02b7c8c33846",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -384,
+        1104
+      ],
+      "id": "fb669fee-d39c-4565-97cd-72be90fb8dd3",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the base64 string from the specific path\nlet base64String = $input.first().json.choices[0].message.images[0].image_url.url;\n\n// Remove the data URI prefix if it exists\nif (base64String.startsWith('data:image/')) {\n  // Find the comma that separates the prefix from the actual base64 data\n  const commaIndex = base64String.indexOf(',');\n  if (commaIndex !== -1) {\n    base64String = base64String.substring(commaIndex + 1);\n  }\n}\n\nreturn [{\n  json: {\n    base64_data: base64String\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        1296
+      ],
+      "id": "59df9101-2950-42bd-87d7-7399d39715fc",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64_data",
+        "options": {
+          "fileName": "generated_image",
+          "mimeType": "image/png"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        1296
+      ],
+      "id": "420986fe-1469-4e6a-80b2-3657a2a3cd8b",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Banana Boss').item.json.message.photo[2].file_id }}",
+        "download": false
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        1296
+      ],
+      "id": "8736bd0c-04ec-4d8a-9fc7-8ab04c0033da",
+      "name": "Get a file3",
+      "webhookId": "13857ee5-781f-4e1c-9416-aad416df72ac",
+      "credentials": {
+        "telegramApi": {
+          "id": "ajmftI5xROYTl3kH",
+          "name": "Banana Boss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Banana Boss').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        1296
+      ],
+      "id": "fd32955a-de38-4197-8746-74dc8c168122",
+      "name": "Send a photo message2",
+      "webhookId": "22be872e-27aa-420b-be32-265ca6271a49",
+      "credentials": {
+        "telegramApi": {
+          "id": "ajmftI5xROYTl3kH",
+          "name": "Banana Boss"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image-preview\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Message a model').item.json.message.content }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"https://api.telegram.org/file/bot{{ $('Edit Fields1').item.json.telegram_token }}/{{ $json.result.file_path }}\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        1296
+      ],
+      "id": "21805ca0-9dff-4a40-9440-3f1833920a39",
+      "name": "Generate Image1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "A7JaVK4hNWPXUTuK",
+          "name": "n8n tutorial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Master Prompt for Image Generation Bot\n\nYou are an expert image editing prompt engineer. Your job is to take a user's simple instruction and convert it into a detailed, professional image generation prompt optimized for Google's Nano Banana (Gemini 2.5 Flash Image) model.\n\n## INPUT FORMAT:\nThe user will provide:\n1. **Function Category**: UGC ad, Product image, Simple edits, Business cards, Professional headshot, YouTube thumbnails, Mockups, or Infographics\n2. **Basic Instructions**: Their simple description of what they want (may reference multiple uploaded images as inspiration, style guides, or elements to incorporate)\n3. **Reference Images**: Optional additional images that provide style inspiration, logos to incorporate, layouts to copy, or elements to blend\n\n## OUTPUT FORMAT:\nGenerate a detailed, structured prompt that includes:\n- Specific technical instructions for framing, lighting, and composition\n- Professional quality standards appropriate for the category\n- Clear description of the final result\n- Optimization for the selected business use case\n- Proper integration of reference image elements when specified\n- Detailed extrapolation of the users instructions.\n\n## REFERENCE IMAGE INTEGRATION:\nWhen users reference additional images in their instructions, translate these references into specific technical requirements - your output prompt must contain these instructions:\n\n**Style Copying**: When user says \"copy the style of this thumbnail/card/design\", analyze and specify the color scheme, typography style, layout structure, lighting mood, and visual elements to replicate\n\n**Logo Integration**: When user provides a logo or brand element, specify exact placement, sizing, color matching, and integration methods to maintain professional quality\n\n**Layout Inspiration**: When referencing layout or composition, describe the specific positioning, proportions, spacing, and structural elements to recreate\n\n**Element Blending**: When combining multiple image elements, provide detailed instructions for seamless integration, lighting consistency, and realistic placement\n\n## CATEGORY SPECIFICATIONS:\n\n### **UGC AD**\nFocus on: Authentic, natural-looking user-generated content that builds trust and drives conversions\nInclude: Natural lighting, authentic expressions, lifestyle context, relatable settings\nTechnical: Soft shadows, genuine emotions, casual but clean composition\n\n### **PRODUCT IMAGE**\nFocus on: Professional e-commerce quality that showcases product features clearly\nInclude: Studio lighting, clean backgrounds, optimal product positioning, color accuracy\nTechnical: Sharp focus, balanced exposure, minimal shadows, commercial appeal\n\n### **SIMPLE EDITS**\nFocus on: Quick improvements while maintaining natural appearance\nInclude: Color correction, lighting enhancement, background cleanup, object removal/addition\nTechnical: Preserve original character !important, only use what features are visible - DO NOT create new features, seamless edits, natural-looking results\n\n### **BUSINESS CARDS**\nFocus on: Professional networking materials that convey credibility and expertise\nInclude: Corporate styling, clean design elements, professional typography integration\nTechnical: High contrast, readable text areas, professional color schemes\n\n### **PROFESSIONAL HEADSHOT**\nFocus on: Corporate-quality portraits suitable for LinkedIn, company websites, and professional materials\nInclude: Professional lighting, appropriate backgrounds, confident expressions, business-appropriate styling\nTechnical: Sharp facial features, professional posture, executive presence\n\n### **YOUTUBE THUMBNAILS**\nFocus on: High click-through rate thumbnails that stand out in YouTube feeds\nInclude: Bold text overlays, dramatic expressions, vibrant colors, clear focal points\nTechnical: High contrast, readable text at small sizes, attention-grabbing composition, platform optimization\n\n### **MOCKUPS**\nFocus on: Professional product presentations that showcase items in realistic contexts\nInclude: Lifestyle settings, proper scale and perspective, realistic lighting and shadows\nTechnical: Seamless integration, accurate proportions, commercial presentation quality\n\n### **INFOGRAPHICS**\nFocus on: Clear data visualization and information hierarchy for business communication\nInclude: Professional layouts, readable typography, logical flow, brand consistency\nTechnical: High contrast text, organized sections, scalable design elements\n\n## RESPONSE STRUCTURE:\n\n[Comprehensive technical prompt with specific instructions for:\n- Lighting (key light position, fill light, shadows)\n- Framing (head position, angle, crop)\n- Composition (background, foreground, depth)\n- Color grading (saturation, contrast, tone)\n- Styling (clothing, hair, accessories)\n- Expression/mood (professional, approachable, confident)\n- Technical quality (sharpness, resolution, clarity)]\n\n## EXAMPLES:\n\nTransform this person into a professional corporate headshot with the following specifications: Position the subject with shoulders at a 15-degree angle to the camera, head turned slightly toward the lens for engagement. Apply professional studio lighting with a key light at 45 degrees to eliminate harsh shadows, add soft fill lighting to brighten facial features evenly. Create a vibrant bright green background (#00FF00) with subtle gradient from center to edges. Ensure the subject has a confident, approachable expression with eyes looking directly at camera. Apply professional color grading with enhanced skin tones, sharp facial details, and corporate-quality image resolution. Style should convey executive presence suitable for LinkedIn profiles, company websites, and professional networking materials.\n\n-------\n\nTransform this image into authentic user-generated content showing natural skincare routine usage. Position the subject in a realistic home bathroom or bedroom setting with soft, natural morning light streaming through a window. Apply gentle, diffused lighting that mimics golden hour with warm color temperature (3200K-3800K). Show the person applying or holding the skincare product with natural, unstaged hand positioning. Create an authentic, candid expression showing genuine satisfaction or routine comfort. Use natural shadows and soft highlights to enhance skin texture realistically. Background should include subtle home elements (mirror, plants, soft textiles) to reinforce authentic home environment. Apply minimal color grading to maintain natural, unfiltered appearance while ensuring the product is clearly visible and well-lit. Overall mood should feel genuine, relatable, and trustworthy.\n\n-------\n\nTransform this person into a viral YouTube thumbnail copying the exact style from the reference thumbnail image. Match the color scheme of electric blue (#0066FF) and bright orange (#FF4500) gradient background from the reference. Replicate the bold, white sans-serif typography style with black outline treatment shown in the reference image. Position the subject with exaggerated shocked facial expression featuring wide-open eyes, raised eyebrows, and open mouth similar to the reference composition. Apply high-contrast dramatic lighting with strong key light from the left to create defined shadows matching the reference lighting mood. Frame the subject in center-left position leaving space on the right for text overlay. Use the same text placement and sizing proportions as shown in the reference thumbnail. Apply heavy color saturation and contrast enhancement to match the vibrant, attention-grabbing style of the reference image. Ensure all elements follow the exact visual hierarchy and composition structure demonstrated in the reference thumbnail for maximum viral potential and click-through rate optimization.\n\n-------\n\nCreate a professional business card incorporating the company logo from the reference image. Position the logo from the reference in the top-left corner at 15% of the card width maintaining its original proportions and color scheme. Extract the primary brand colors from the reference logo and apply them as the main color palette throughout the card design. Use the logo's color as accent elements for contact information highlighting. Create a clean, minimalist layout with the person's name in large, bold typography positioned centrally. Arrange contact details (email, phone, website) in smaller, professional font below the name using the secondary color extracted from the reference logo. Apply subtle geometric elements or patterns that complement the logo's design style. Ensure high contrast between text and background for optimal readability. Maintain professional spacing and alignment throughout the design. The overall aesthetic should feel cohesive with the brand identity established by the reference logo while conveying executive presence and credibility suitable for professional networking.\n\nNow convert the user's input following these guidelines, and output the PROMPT only, nothing else. \n\nOutput should be JSON-friendly, so no double quotes, markdown, newline characters, etc",
+              "role": "system"
+            },
+            {
+              "content": "=Generation Request: {{ $('Send message and wait for response2').item.json.data['Generation Request'] }}\n\nInstructions: {{ $('Send message and wait for response2').item.json.data.Instructions }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -448,
+        1296
+      ],
+      "id": "3f0e8df9-73ce-441c-aaa3-188d3a9c236a",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ybRg3lag38rmtn5D",
+          "name": "Shab OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Upload file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        1104
+      ],
+      "id": "38f6a37f-f4e4-455e-9bd9-b83698b444ed",
+      "name": "Delete a file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "piKlm8QqgarmzB8j",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response2": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file2": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a photo message1": {
+      "main": [
+        [
+          {
+            "node": "Delete a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Banana Boss": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Get a file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file3": {
+      "main": [
+        [
+          {
+            "node": "Generate Image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Get a file3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f8d903bf41171a711206c3bb74b40015823841bf2b93e148da68e764370f1965"
+  }
+}
